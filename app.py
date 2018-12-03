@@ -1,22 +1,7 @@
 
-# coding: utf-8
-
-# In[1]:
 
 
-import dash
-import dash_core_components as dcc
-import dash_html_components as html
-
-import pandas as pd
-
-df = pd.read_csv(
-    'DataProject3.csv')
-
-df.head()
-
-
-# In[6]:
+ In[6]:
 
 
 import dash
@@ -27,6 +12,7 @@ import pandas as pd
 
 app = dash.Dash(__name__)
 server = app.server
+
 
 df = pd.read_csv('DataProject3.csv')
 
@@ -40,11 +26,26 @@ app.layout = html.Div([
             
             '''),
 
+df = pd.read_csv(
+    'DataProject3.csv')
+
+available_indicators = df['NA_ITEM'].unique()
+available_countries=df['GEO'].unique()
+
+app.layout = html.Div([
+    html.Div([
+        html.Div([
+
+
             html.Div([
                 dcc.Dropdown(
                     id='xaxis-column',
                     options=[{'label': i, 'value': i} for i in available_indicators],
+
                     value='Gross domestic product at market prices'
+
+                    value='Fertility rate, total (births per woman)'
+
                 ),
                 dcc.RadioItems(
                     id='xaxis-type',
@@ -53,13 +54,21 @@ app.layout = html.Div([
                     labelStyle={'display': 'inline-block'}
                 ),
             ],
+
             style={'width': '40%', 'display': 'inline-block','margin-bottom' : '30px'}),
+
+            style={'width': '40%', 'display': 'inline-block'}),
+
 
             html.Div([
                 dcc.Dropdown(
                     id='yaxis-column',
                     options=[{'label': i, 'value': i} for i in available_indicators],
+
                     value='Gross domestic product at market prices'
+
+                    value='Fertility rate, total (births per woman)'
+
                 ),
                 dcc.RadioItems(
                     id='yaxis-type',
@@ -67,7 +76,10 @@ app.layout = html.Div([
                     value='Linear',
                     labelStyle={'display': 'inline-block'}
                 )
+
             ],style={'width': '48%', 'float': 'right', 'display': 'inline-block','margin-bottom' : '30px'})
+
+            ],style={'width': '40%', 'float': 'right', 'display': 'inline-block'})
         ]),
 
         dcc.Graph(id='indicator-graphic'),
@@ -80,10 +92,12 @@ app.layout = html.Div([
             step=None,
             marks={str(year): str(year) for year in df['TIME'].unique()}
         ),
+
         
         dcc.Markdown('''## Second exercise:
         
         '''),
+
     ]), 
 
     html.Div([
@@ -93,7 +107,11 @@ app.layout = html.Div([
                 options=[{'label': i, 'value': i} for i in available_countries],
                 value='Belgium'
             ),
+
         ],style={'width': '40%', 'display': 'inline-block','margin-bottom' : '30px'}),
+
+        ],style={'width': '40%', 'display': 'inline-block'}),
+
 
         html.Div([
             dcc.Dropdown(
@@ -101,7 +119,11 @@ app.layout = html.Div([
                 options=[{'label': i, 'value': i} for i in available_indicators],
                 value='Gross domestic product at market prices'
             ),
+
         ],style={'width': '40%', 'float': 'right', 'display': 'inline-block','margin-bottom' : '30px'}),
+
+        ],style={'width': '40%', 'float': 'right', 'display': 'inline-block'}),
+
 
         dcc.Graph(id='country-graphic')
 
@@ -121,8 +143,12 @@ app.layout = html.Div([
 def update_graph(xaxis_column_name, yaxis_column_name,
                  xaxis_type, yaxis_type,
                  year_value):
+
     dff1 = df[df['UNIT']=='Current prices, million euro']
     dff = dff1[dff1['TIME'] == year_value]
+
+    dff = df[df['TIME'] == year_value]
+
     
     return {
         'data': [go.Scatter(
@@ -145,7 +171,11 @@ def update_graph(xaxis_column_name, yaxis_column_name,
                 'title': yaxis_column_name,
                 'type': 'linear' if yaxis_type == 'Linear' else 'log'
             },
+
             margin={'l': 70 , 'b': 50, 't': 50, 'r': 0, 'autoexpand':True},
+            
+            margin={'l': 60 , 'b': 60, 't': 20, 'r': 4, 'pad':50},
+
             hovermode='closest'
         )
     }
@@ -154,6 +184,7 @@ def update_graph(xaxis_column_name, yaxis_column_name,
     dash.dependencies.Output('country-graphic','figure'),
     [dash.dependencies.Input('geo-dropdown','value'),
      dash.dependencies.Input('indi-dropdown','value')])
+
 
 def update_graph2(geo_dropdown_name,indi_dropdown_name):
     dff_1 = df[df['UNIT']=='Current prices, million euro']
@@ -164,6 +195,17 @@ def update_graph2(geo_dropdown_name,indi_dropdown_name):
             x=dff_2['TIME'].unique(),
             y=dff_2[dff_2['NA_ITEM'] == indi_dropdown_name]['Value'],
             text=dff_2[dff_2['NA_ITEM'] == indi_dropdown_name]['TIME'],
+
+def update_graph2(dropdown_geo_name,dropdown_indi_name):
+    dff1 = df[df['UNIT']=='Current prices, million euro']
+    dff2 = dff1[dff1['GEO'] == dropdown_geo_name]
+    
+    return {
+        'data': [go.Scatter(
+            x=dff2['TIME'].unique(),
+            y=dff2[dff2['NA_ITEM'] == dropdown_indi_name]['Value'],
+            text=dff2[dff2['NA_ITEM'] == dropdown_indi_name]['TIME'],
+
             mode='lines',
         )],
         'layout': go.Layout(
@@ -173,13 +215,20 @@ def update_graph2(geo_dropdown_name,indi_dropdown_name):
                 'title': 'Year'
             },
             yaxis={
+
                 'title':indi_dropdown_name
             },
             margin={'l': 70 , 'b': 50, 't': 50, 'r': 0, 'autoexpand':True},
+
+                'title':'Geo'
+            },
+            margin={'l': 60 , 'b': 60, 't': 20, 'r': 4, 'pad':50},
+
             hovermode='closest'
         )
     }
 if __name__ == '__main__':
     app.run_server()
-    
+
+
 
