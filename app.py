@@ -11,7 +11,8 @@ df = pd.read_csv('DataProject3.csv')
 
 available_indicators = df['NA_ITEM'].unique()
 available_countries=df['GEO'].unique()
-title2= 'Graph'
+title2= 'Graph2- Country and Indicator - Current prices, million euro'
+title1='Graph1 - Indicator and Indicator - Current prices, million euro'
 app.layout = html.Div([
     html.Div([
         html.Div([
@@ -116,6 +117,7 @@ def update_graph(xaxis_column_name, yaxis_column_name,
             }
         )],
         'layout': go.Layout(
+            title=title1,
             xaxis={
                 'title': xaxis_column_name,
                 'type': 'linear' if xaxis_type == 'Linear' else 'log'
